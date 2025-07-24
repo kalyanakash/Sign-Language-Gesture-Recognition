@@ -14,6 +14,7 @@ from datetime import datetime
 from itsdangerous.url_safe import URLSafeTimedSerializer as Serializer
 from flask_mail import Message, Mail
 import os
+import sys
 import random
 import re
 import pickle
@@ -30,11 +31,18 @@ CORS(app)  # Allow cross-origin requests for all routes
 bcrypt = Bcrypt(app)
 
 # -------------------Database Model Setup-------------------
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///database.db')
+# Handle database URL for both local and Render environments
+database_url = os.environ.get('DATABASE_URL', 'sqlite:///database.db')
+if database_url.startswith("postgres://"):
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'thisisasecretkey')
 serializer = Serializer(app.config['SECRET_KEY'])
 db = SQLAlchemy(app)
 app.app_context().push()
+print(f"Database configured: {database_url}")  # Debug info
 
 
 login_manager = LoginManager()
@@ -65,7 +73,35 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(30), nullable=False)
     password = db.Column(db.String(80), nullable=False)
     date_created = db.Column(db.DateTime, default=datetime.utcnow)
+
+# Initialize database tables
+try:
+    db.create_all()
+    print("Database tables created successfully!")
+except Exception as e:
+    print(f"Database initialization error: {e}")
 # ----------------------------------------------------
+
+# -------------------Health Check Route---------------
+@app.route('/health')
+def health_check():
+    """Health check endpoint for debugging deployment issues"""
+    try:
+        # Test database connection
+        user_count = User.query.count()
+        db_status = f"Database OK (users: {user_count})"
+    except Exception as e:
+        db_status = f"Database Error: {e}"
+    
+    # Test model status
+    model_status = "Model OK" if model is not None else "Model not loaded"
+    
+    return jsonify({
+        'status': 'healthy',
+        'database': db_status,
+        'model': model_status,
+        'python_version': sys.version
+    })
 
 # -------------------Welcome or Home Page-------------
 
@@ -318,12 +354,18 @@ def update_password():
 # --------------------------- Machine Learning ------------------
 # Temporarily disabled for deployment without OpenCV/MediaPipe
 # --------------------------- Machine Learning ------------------
+# Load ML model with better error handling
 try:
-    model_dict = pickle.load(open('./model.p', 'rb'))
+    model_path = os.path.join(os.path.dirname(__file__), 'model.p')
+    if not os.path.exists(model_path):
+        model_path = './model.p'  # Fallback to relative path
+    
+    with open(model_path, 'rb') as f:
+        model_dict = pickle.load(f)
     model = model_dict['model']
-    print("Model loaded successfully!")
+    print(f"Model loaded successfully from: {model_path}")
 except Exception as e:
-    print("Error loading the model:", e)
+    print(f"Error loading the model: {e}")
     model = None
 
 @app.route('/generate_frames', methods=['POST'])
