@@ -3,5 +3,9 @@
 
 set -o errexit  # exit on error
 
-pip install --upgrade pip
-pip install -r requirements.txt
+# Upgrade pip and setuptools first
+python -m pip install --upgrade pip
+pip install --upgrade setuptools wheel
+
+# Install dependencies
+pip install --no-cache-dir -r requirements.txt
