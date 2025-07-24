@@ -7,7 +7,8 @@ from flask import Flask, jsonify, render_template, url_for, redirect, flash, ses
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
-from wtforms import StringField, PasswordField, SubmitField, Form
+from wtforms import StringField, PasswordField, SubmitField
+from flask_wtf import FlaskForm
 from wtforms.validators import InputRequired, Length, ValidationError, Email, EqualTo
 from flask_bcrypt import Bcrypt
 from datetime import datetime
@@ -133,7 +134,7 @@ def guide():
 
 
 # -------------------Login Page-------------------
-class LoginForm(Form):
+class LoginForm(FlaskForm):
     username = StringField(label='username', validators=[InputRequired()], render_kw={"placeholder": "Username"})
     email = StringField(label='email', validators=[InputRequired(), Email()], render_kw={"placeholder": "Email"})
     password = PasswordField(label='password', validators=[InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Password"})
@@ -194,7 +195,7 @@ def logout():
 
 # -------------------Register Page-------------------
 
-class RegisterForm(Form):
+class RegisterForm(FlaskForm):
     username = StringField(label='username', validators=[InputRequired()], render_kw={"placeholder": "Username"})
     email = StringField(label='email', validators=[InputRequired(), Email()], render_kw={"placeholder": "Email"})
     password = PasswordField(label='password', validators=[InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Password"})
@@ -228,7 +229,7 @@ def register():
 # -------------------Update or reset Email Page-------------------
 
 
-class ResetMailForm(Form):
+class ResetMailForm(FlaskForm):
     username = StringField(label='username', validators=[InputRequired()], render_kw={"placeholder": "Username"})
     email = StringField(label='email', validators=[InputRequired(), Email()], render_kw={"placeholder": "Old Email"})
     new_email = StringField(label='new_email', validators=[InputRequired(), Email()], render_kw={"placeholder": "New Email"})
@@ -258,13 +259,13 @@ def reset_email():
 
 # -------------------Forgot Password With OTP-------------------
 
-class ResetPasswordForm(Form):
+class ResetPasswordForm(FlaskForm):
     username = StringField(label='username', validators=[InputRequired()], render_kw={"placeholder": "Username"})
     email = StringField(label='email', validators=[InputRequired(), Email()], render_kw={"placeholder": "Email"})
     submit = SubmitField('Submit', validators=[InputRequired()])
 
 
-class ForgotPasswordForm(Form):
+class ForgotPasswordForm(FlaskForm):
     username = StringField(label='username', validators=[InputRequired()], render_kw={"placeholder": "Username"})
     email = StringField(label='email', validators=[InputRequired(), Email()], render_kw={"placeholder": "Email"})
     new_password = PasswordField(label='new_password', validators=[InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "New Password"})
@@ -324,7 +325,7 @@ def forgot_password():
 
 # ------------------------- Update Password ---------------------
 
-class UpdatePasswordForm(Form):
+class UpdatePasswordForm(FlaskForm):
     username = StringField(label='username', validators=[InputRequired()], render_kw={"placeholder": "Username"})
     email = StringField(label='email', validators=[InputRequired(), Email()], render_kw={"placeholder": "Email"})
     new_password = PasswordField(label='new_password', validators=[InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "New Password"})

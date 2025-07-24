@@ -22,7 +22,7 @@ pip install --no-cache-dir itsdangerous==2.1.2 WTForms==3.0.1 email_validator==2
 
 echo "Installing scientific packages..."
 pip install --no-cache-dir numpy==1.24.3
-pip install --no-cache-dir scikit-learn==1.3.0
+pip install --no-cache-dir scikit-learn==1.3.2
 
 echo "Installing computer vision packages (LATEST VERSIONS)..."
 pip install --no-cache-dir opencv-python-headless==4.8.0.76
