@@ -3,6 +3,9 @@ builder = "NIXPACKS"
 
 [deploy]
 healthcheckPath = "/"
-healthcheckTimeout = 100
+healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 10
+
+[build.environment]
+NIXPACKS_BUILD_CMD = "pip install --no-cache-dir -r requirements.txt"
