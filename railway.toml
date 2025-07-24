@@ -9,4 +9,4 @@ restartPolicyMaxRetries = 10
 
 [variables]
 NIXPACKS_NO_CACHE = "1"
-SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL = "False"
+PIP_NO_CACHE_DIR = "1"
