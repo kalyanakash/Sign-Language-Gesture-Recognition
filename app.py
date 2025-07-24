@@ -1,4 +1,5 @@
-# I am using mediapipe as a hand landmark processing and prediction and landmark detector and a Random Forest classifier as sign classifier.
+# Sign Language Detector Flask Application
+# Hand landmark processing and prediction using Random Forest classifier
 
 
 from wsgiref.simple_server import WSGIServer
@@ -6,9 +7,7 @@ from flask import Flask, jsonify, render_template, url_for, redirect, flash, ses
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
-# from flask_wtf import Form
 from wtforms import StringField, PasswordField, SubmitField, Form
-
 from wtforms.validators import InputRequired, Length, ValidationError, Email, EqualTo
 from flask_bcrypt import Bcrypt
 from datetime import datetime
