@@ -16,6 +16,7 @@ from flask_bcrypt import Bcrypt
 from datetime import datetime
 from itsdangerous.url_safe import URLSafeTimedSerializer as Serializer
 from flask_mail import Message, Mail
+import os
 import random
 import re
 import pickle
@@ -31,8 +32,8 @@ CORS(app)  # Allow cross-origin requests for all routes
 bcrypt = Bcrypt(app)
 
 # -------------------Database Model Setup-------------------
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
-app.config['SECRET_KEY'] = 'thisisasecretkey'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///database.db')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'thisisasecretkey')
 serializer = Serializer(app.config['SECRET_KEY'])
 db = SQLAlchemy(app)
 app.app_context().push()
@@ -45,8 +46,8 @@ login_manager.login_view = 'login'
 # -------------------mail configuration-------------------
 app.config["MAIL_SERVER"] = 'smtp.gmail.com'
 app.config["MAIL_PORT"] = 587
-app.config["MAIL_USERNAME"] = 'handssignify@gmail.com'
-app.config["MAIL_PASSWORD"] = 'ttbylakctxvvvnxe'
+app.config["MAIL_USERNAME"] = os.environ.get('MAIL_USERNAME', 'handssignify@gmail.com')
+app.config["MAIL_PASSWORD"] = os.environ.get('MAIL_PASSWORD', 'ttbylakctxvvvnxe')
 app.config["MAIL_USE_TLS"] = True
 app.config["MAIL_USE_SSL"] = False
 mail = Mail(app)
@@ -408,4 +409,5 @@ def video_feed():
 # -----------------------------  end  ---------------------------
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
