@@ -119,11 +119,74 @@
     {% endwith %}
 
     <div class="under">
-        <button id="startCameraButton" class="btn btn-outline-light my-2">Start Camera</button>
-        <button id="closeCameraButton" style="display: none;" class="btn btn-outline-light my-2">Close Camera</button>
-        <h1>Camera Stream</h1>
-        <div id="cameraFeedContainer" style="display: none;">
-            <img id="cameraFeed" src="">
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <h1 class="text-light mb-4">🤟 Sign Language Detector</h1>
+                    
+                    <!-- Cloud Notice -->
+                    <div class="alert alert-info" role="alert">
+                        <strong>📱 Cloud Demo Mode:</strong> Camera access is restricted on cloud platforms. 
+                        <br>For <strong>full webcam functionality</strong>, download and run locally!
+                        <br><a href="/download_instructions" class="btn btn-sm btn-primary mt-2" target="_blank">Get Setup Instructions</a>
+                    </div>
+                    
+                    <!-- Camera Controls -->
+                    <button id="startCameraButton" class="btn btn-outline-light btn-lg my-2">
+                        📹 Start Camera Demo
+                    </button>
+                    <button id="closeCameraButton" style="display: none;" class="btn btn-outline-danger btn-lg my-2">
+                        ❌ Close Camera
+                    </button>
+                    
+                    <!-- Camera Feed -->
+                    <div id="cameraFeedContainer" style="display: none;" class="mt-4">
+                        <div class="border border-light rounded p-3" style="background: rgba(0,0,0,0.3);">
+                            <img id="cameraFeed" src="" class="img-fluid rounded" style="max-width: 100%; height: auto;">
+                        </div>
+                    </div>
+                    
+                    <!-- Features Info -->
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card bg-dark text-light">
+                                <div class="card-header">
+                                    <h5>🎯 Features Available Locally</h5>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-unstyled">
+                                        <li>✅ Real-time webcam access</li>
+                                        <li>✅ Live hand landmark detection</li>
+                                        <li>✅ Instant ASL recognition</li>
+                                        <li>✅ All 26 letters (A-Z)</li>
+                                        <li>✅ High accuracy predictions</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-dark text-light">
+                                <div class="card-header">
+                                    <h5>💻 Local Setup</h5>
+                                </div>
+                                <div class="card-body">
+                                    <ol class="small">
+                                        <li>Download from GitHub</li>
+                                        <li>Install requirements</li>
+                                        <li>Run: <code>python app.py</code></li>
+                                        <li>Open: localhost:5000</li>
+                                        <li>Enjoy full camera features!</li>
+                                    </ol>
+                                    <a href="https://github.com/kalyanakash/Sign-Language-Gesture-Recognition" 
+                                       class="btn btn-success btn-sm" target="_blank">
+                                        📥 Download Project
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <!-- <h1 id="predicted-char">Predicted Character: </h1> -->
         <!-- <h1 id="predicted-char">Predicted character:-{{character}}</h1> -->

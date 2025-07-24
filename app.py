@@ -386,17 +386,58 @@ def generate_frames():
         
         # Check if camera is accessible
         if not cap.isOpened():
-            # Return a static error frame
-            error_frame = np.zeros((480, 640, 3), dtype=np.uint8)
-            cv2.putText(error_frame, 'Camera not accessible', (50, 240), 
-                       cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-            cv2.putText(error_frame, 'This feature works locally', (50, 280), 
-                       cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+            # Create a more informative demo frame
+            demo_frame = np.zeros((480, 640, 3), dtype=np.uint8)
             
-            ret, buffer = cv2.imencode('.jpg', error_frame)
+            # Background color
+            demo_frame[:] = (40, 40, 40)
+            
+            # Title
+            cv2.putText(demo_frame, 'Sign Language Detector - DEMO', (80, 60), 
+                       cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+            
+            # Main message
+            cv2.putText(demo_frame, 'Camera Not Available on Cloud', (120, 120), 
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 2)
+            
+            # Instructions
+            messages = [
+                'This is a live demo of the interface',
+                'For REAL camera functionality:',
+                '1. Download this project locally',
+                '2. Install: pip install -r requirements.txt',
+                '3. Run: python app.py',
+                '4. Your webcam will work perfectly!',
+                '',
+                f'Model Status: {"✓ Loaded" if model else "✗ Not loaded"}',
+                f'Supported Signs: A-Z ({len(labels_dict)} letters)',
+                '',
+                'Cloud URL: sign-language-gesture-recognition.onrender.com'
+            ]
+            
+            y_pos = 160
+            for msg in messages:
+                color = (0, 255, 0) if '✓' in msg else (255, 255, 255)
+                if '✗' in msg:
+                    color = (0, 0, 255)
+                cv2.putText(demo_frame, msg, (50, y_pos), 
+                           cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 1)
+                y_pos += 25
+            
+            # Simulate hand landmarks for demo
+            import time
+            current_time = time.time()
+            demo_letter = labels_dict[int(current_time) % len(labels_dict)]
+            cv2.putText(demo_frame, f'Demo Prediction: {demo_letter}', (200, 430), 
+                       cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+            
+            ret, buffer = cv2.imencode('.jpg', demo_frame)
             frame = buffer.tobytes()
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+            
+            while True:
+                yield (b'--frame\r\n'
+                       b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+                time.sleep(0.1)  # Update demo every 100ms
             return
         
         while True:
@@ -498,8 +539,63 @@ def camera_info():
         "message": "Camera access is restricted on cloud deployments",
         "suggestion": "Download and run locally for full camera functionality",
         "model_loaded": model is not None,
-        "supported_signs": list(labels_dict.values()) if model else []
+        "supported_signs": list(labels_dict.values()) if model else [],
+        "github_repo": "https://github.com/kalyanakash/Sign-Language-Gesture-Recognition",
+        "setup_instructions": [
+            "1. Clone: git clone https://github.com/kalyanakash/Sign-Language-Gesture-Recognition.git",
+            "2. Install: pip install -r requirements.txt", 
+            "3. Run: python app.py",
+            "4. Open: http://localhost:5000",
+            "5. Enable your webcam and enjoy real-time sign language detection!"
+        ]
     })
+
+@app.route('/local_setup')
+def local_setup():
+    """Display local setup instructions"""
+    return render_template('setup_guide.html' if os.path.exists('templates/setup_guide.html') else 'guide.html')
+
+@app.route('/download_instructions')
+def download_instructions():
+    """Provide download and setup instructions"""
+    instructions = {
+        "title": "Get Full Camera Functionality",
+        "description": "Download and run this project locally to use your webcam for real-time sign language detection",
+        "steps": [
+            {
+                "step": 1,
+                "title": "Download the Project",
+                "description": "Clone or download from GitHub",
+                "command": "git clone https://github.com/kalyanakash/Sign-Language-Gesture-Recognition.git"
+            },
+            {
+                "step": 2, 
+                "title": "Install Dependencies",
+                "description": "Install all required packages",
+                "command": "pip install -r requirements.txt"
+            },
+            {
+                "step": 3,
+                "title": "Run Locally",
+                "description": "Start the application",
+                "command": "python app.py"
+            },
+            {
+                "step": 4,
+                "title": "Access Locally",
+                "description": "Open in your browser",
+                "command": "http://localhost:5000"
+            }
+        ],
+        "features": [
+            "Real-time webcam access",
+            "Live hand landmark detection", 
+            "Instant sign language recognition",
+            "All 26 ASL letters (A-Z)",
+            "No cloud limitations"
+        ]
+    }
+    return jsonify(instructions)
 
 @app.route('/generate_frames', methods=['POST'])
 def generate_frames_api():
