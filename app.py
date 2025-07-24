@@ -17,11 +17,13 @@ import os
 import random
 import re
 import pickle
+# Computer vision imports disabled for deployment
 # import cv2
 # import mediapipe as mp
-# import numpy as np  # Not used in current version
+# Numpy not needed in current version
 
 app = Flask(__name__)
+print("Flask app starting - no numpy imports!")  # Debug message
 
 CORS(app)  # Allow cross-origin requests for all routes
 

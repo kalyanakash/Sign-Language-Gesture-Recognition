@@ -1,3 +1,4 @@
-# Deploy timestamp: 2025-07-24 17:30
+# Deploy timestamp: 2025-07-25 10:00
 # This file forces Render to use the latest code version
-DEPLOY_VERSION=20250724-1730
+DEPLOY_VERSION=20250725-1000
+FORCE_CLEAN_BUILD=true
