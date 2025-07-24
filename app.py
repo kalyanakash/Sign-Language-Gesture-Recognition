@@ -19,7 +19,7 @@ import re
 import pickle
 # import cv2
 # import mediapipe as mp
-import numpy as np
+# import numpy as np  # Not used in current version
 
 app = Flask(__name__)
 
