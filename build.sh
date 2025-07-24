@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Complete build script for Render - ALL PACKAGES
+# Complete build script for Render - LATEST VALID VERSIONS
 # Updated: 2025-07-25
 
 set -o errexit  # exit on error
 
-echo "Starting COMPLETE build with ALL packages..."
+echo "Starting COMPLETE build with LATEST VALID packages..."
 
 # Upgrade pip and build tools
 pip install --upgrade pip setuptools wheel
@@ -24,12 +24,13 @@ echo "Installing scientific packages..."
 pip install --no-cache-dir numpy==1.24.3
 pip install --no-cache-dir scikit-learn==1.3.0
 
-echo "Installing computer vision packages..."
-pip install --no-cache-dir opencv-python-headless==4.8.0.74
-pip install --no-cache-dir mediapipe==0.10.2
+echo "Installing computer vision packages (LATEST VERSIONS)..."
+pip install --no-cache-dir opencv-python-headless==4.8.0.76
+pip install --no-cache-dir mediapipe==0.10.21
 
 echo "Installing additional packages..."
 pip install --no-cache-dir matplotlib==3.7.2 pillow==10.0.0
 pip install --no-cache-dir python-socketio==5.8.0 eventlet==0.33.3
+pip install --no-cache-dir pandas==2.0.3 scipy==1.11.1
 
-echo "Build completed successfully - ALL PACKAGES INSTALLED!"
+echo "Build completed successfully - ALL LATEST PACKAGES INSTALLED!"
