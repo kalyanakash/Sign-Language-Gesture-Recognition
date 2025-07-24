@@ -18,7 +18,7 @@ pip install --no-cache-dir flask-cors==4.0.0 flask-sqlalchemy==3.0.5 flask-login
 pip install --no-cache-dir flask-bcrypt==1.0.1 flask-mail==0.9.1 flask-wtf==1.0.1
 
 echo "Installing core dependencies..."
-pip install --no-cache-dir itsdangerous==2.1.2 WTForms==3.0.1 MarkupSafe==2.1.3 Jinja2==3.1.2
+pip install --no-cache-dir itsdangerous==2.1.2 WTForms==3.0.1 email_validator==2.0.0 MarkupSafe==2.1.3 Jinja2==3.1.2
 
 echo "Installing scientific packages..."
 pip install --no-cache-dir numpy==1.24.3
