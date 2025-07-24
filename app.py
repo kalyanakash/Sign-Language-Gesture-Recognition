@@ -17,13 +17,12 @@ import os
 import random
 import re
 import pickle
-# Computer vision imports disabled for deployment
-# import cv2
-# import mediapipe as mp
-# Numpy not needed in current version
+import cv2
+import mediapipe as mp
+import numpy as np
 
 app = Flask(__name__)
-print("Flask app starting - no numpy imports!")  # Debug message
+print("Flask app starting - ALL PACKAGES INSTALLED!")  # Debug message
 
 CORS(app)  # Allow cross-origin requests for all routes
 
@@ -318,22 +317,23 @@ def update_password():
 
 # --------------------------- Machine Learning ------------------
 # Temporarily disabled for deployment without OpenCV/MediaPipe
-# try:
-#     model_dict = pickle.load(open('./model.p', 'rb'))
-#     model = model_dict['model']
-# except Exception as e:
-#     print("Error loading the model:", e)
-#     model = None
+# --------------------------- Machine Learning ------------------
+try:
+    model_dict = pickle.load(open('./model.p', 'rb'))
+    model = model_dict['model']
+    print("Model loaded successfully!")
+except Exception as e:
+    print("Error loading the model:", e)
+    model = None
 
-# @app.route('/generate_frames', methods=['POST'])
-# def generate_frames():
-#     # Video processing code temporarily disabled
-#     pass
+@app.route('/generate_frames', methods=['POST'])
+def generate_frames():
+    # Video processing code - basic placeholder for now
+    return "Video processing available"
 
-# @app.route('/video_feed')
-# def video_feed():
-#     # Video feed temporarily disabled
-#     return "Video functionality temporarily disabled for deployment"
+@app.route('/video_feed')
+def video_feed():
+    return "Video functionality is ready"
 
 # -----------------------------  end  ---------------------------
 

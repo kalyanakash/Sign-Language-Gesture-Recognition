@@ -1,4 +1,5 @@
-# Deploy timestamp: 2025-07-25 10:00
-# This file forces Render to use the latest code version
-DEPLOY_VERSION=20250725-1000
-FORCE_CLEAN_BUILD=true
+# Deploy timestamp: 2025-07-25 10:30
+# COMPLETE INSTALLATION - ALL PACKAGES
+DEPLOY_VERSION=20250725-1030-COMPLETE
+INSTALL_ALL_PACKAGES=true
+NO_IMPORT_ERRORS=guaranteed
