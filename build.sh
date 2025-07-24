@@ -1,11 +1,8 @@
 #!/usr/bin/env bash
-# This file tells Render how to build your app
+# Simple build script for Render - Python 3.11 compatible
 
 set -o errexit  # exit on error
 
-# Upgrade pip and setuptools first
-python -m pip install --upgrade pip
-pip install --upgrade setuptools wheel
-
-# Install dependencies
+# Install basic Flask dependencies only
+pip install --upgrade pip
 pip install --no-cache-dir -r requirements.txt
