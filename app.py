@@ -369,14 +369,142 @@ except Exception as e:
     print(f"Error loading the model: {e}")
     model = None
 
-@app.route('/generate_frames', methods=['POST'])
+# Initialize MediaPipe
+mp_hands = mp.solutions.hands
+mp_drawing = mp.solutions.drawing_utils
+mp_drawing_styles = mp.solutions.drawing_styles
+
+hands = mp_hands.Hands(static_image_mode=True, min_detection_confidence=0.3)
+
+# Labels for sign language classes
+labels_dict = {0: 'A', 1: 'B', 2: 'C', 3: 'D', 4: 'E', 5: 'F', 6: 'G', 7: 'H', 8: 'I', 9: 'J', 10: 'K', 11: 'L', 12: 'M', 13: 'N', 14: 'O', 15: 'P', 16: 'Q', 17: 'R', 18: 'S', 19: 'T', 20: 'U', 21: 'V', 22: 'W', 23: 'X', 24: 'Y', 25: 'Z'}
+
 def generate_frames():
-    # Video processing code - basic placeholder for now
-    return "Video processing available"
+    """Generate video frames with hand landmark detection"""
+    try:
+        cap = cv2.VideoCapture(0)
+        
+        # Check if camera is accessible
+        if not cap.isOpened():
+            # Return a static error frame
+            error_frame = np.zeros((480, 640, 3), dtype=np.uint8)
+            cv2.putText(error_frame, 'Camera not accessible', (50, 240), 
+                       cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+            cv2.putText(error_frame, 'This feature works locally', (50, 280), 
+                       cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+            
+            ret, buffer = cv2.imencode('.jpg', error_frame)
+            frame = buffer.tobytes()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+            return
+        
+        while True:
+            success, frame = cap.read()
+            if not success:
+                break
+            
+            # Convert the frame to RGB
+            rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            
+            # Process the frame for hand landmarks
+            results = hands.process(rgb_frame)
+            
+            predicted_character = ''
+            
+            if results.multi_hand_landmarks:
+                for hand_landmarks in results.multi_hand_landmarks:
+                    # Draw hand landmarks
+                    mp_drawing.draw_landmarks(
+                        frame, hand_landmarks, mp_hands.HAND_CONNECTIONS,
+                        mp_drawing_styles.get_default_hand_landmarks_style(),
+                        mp_drawing_styles.get_default_hand_connections_style()
+                    )
+                    
+                    # Extract landmark data for prediction
+                    if model is not None:
+                        data_aux = []
+                        x_ = []
+                        y_ = []
+                        
+                        for i in range(len(hand_landmarks.landmark)):
+                            x = hand_landmarks.landmark[i].x
+                            y = hand_landmarks.landmark[i].y
+                            x_.append(x)
+                            y_.append(y)
+                        
+                        for i in range(len(hand_landmarks.landmark)):
+                            x = hand_landmarks.landmark[i].x
+                            y = hand_landmarks.landmark[i].y
+                            data_aux.append(x - min(x_))
+                            data_aux.append(y - min(y_))
+                        
+                        # Make prediction
+                        try:
+                            prediction = model.predict([np.asarray(data_aux)])
+                            predicted_character = labels_dict[int(prediction[0])]
+                        except Exception as e:
+                            print(f"Prediction error: {e}")
+                            predicted_character = "?"
+            
+            # Add predicted character to frame
+            if predicted_character:
+                cv2.putText(frame, f'Predicted: {predicted_character}', (10, 50), 
+                           cv2.FONT_HERSHEY_SIMPLEX, 1.3, (0, 255, 0), 3, cv2.LINE_AA)
+            
+            # Add status text
+            cv2.putText(frame, 'Sign Language Detector - Live', (10, frame.shape[0] - 20), 
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2, cv2.LINE_AA)
+            
+            # Encode frame as JPEG
+            ret, buffer = cv2.imencode('.jpg', frame)
+            frame = buffer.tobytes()
+            
+            # Yield frame in multipart format
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+        
+        cap.release()
+        
+    except Exception as e:
+        print(f"Camera initialization error: {e}")
+        # Return error frame
+        error_frame = np.zeros((480, 640, 3), dtype=np.uint8)
+        cv2.putText(error_frame, f'Camera Error: {str(e)[:40]}', (20, 240), 
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 2)
+        cv2.putText(error_frame, 'Camera access may be restricted', (20, 280), 
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 2)
+        
+        ret, buffer = cv2.imencode('.jpg', error_frame)
+        frame = buffer.tobytes()
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
 @app.route('/video_feed')
 def video_feed():
-    return "Video functionality is ready"
+    """Video streaming route"""
+    try:
+        return Response(generate_frames(),
+                       mimetype='multipart/x-mixed-replace; boundary=frame')
+    except Exception as e:
+        print(f"Video feed error: {e}")
+        return f"Camera error: {e}", 500
+
+@app.route('/camera_info')
+def camera_info():
+    """Provide information about camera functionality"""
+    return jsonify({
+        "camera_available": False,
+        "message": "Camera access is restricted on cloud deployments",
+        "suggestion": "Download and run locally for full camera functionality",
+        "model_loaded": model is not None,
+        "supported_signs": list(labels_dict.values()) if model else []
+    })
+
+@app.route('/generate_frames', methods=['POST'])
+def generate_frames_api():
+    """API endpoint for frame generation (legacy support)"""
+    return jsonify({"status": "Camera functionality moved to /video_feed"})
 
 # -----------------------------  end  ---------------------------
 
